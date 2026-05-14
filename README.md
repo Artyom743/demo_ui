@@ -7,7 +7,7 @@
 
 ## 📋 Что нужно для запуска
 
-- **Терминал** (Command Prompt, PowerShell, Git Bash, или любой другой)
+- **Терминал** (Command Prompt, Git Bash, или любой другой)
 - **curl** (обычно уже установлен на macOS/Linux, на Windows есть в Git Bash)
 
 ---
@@ -26,7 +26,7 @@ curl -X POST \
 
 ### Шаг 2: Вставьте в терминал и нажмите Enter  
 
-* Windows: откройте Git Bash (или PowerShell) → вставьте команду → Enter  
+* Windows: откройте Git Bash → вставьте команду → Enter  
 * macOS / Linux: откройте Терминал → вставьте команду → Enter
 
 ### Шаг 3: Дождитесь выполнения  
