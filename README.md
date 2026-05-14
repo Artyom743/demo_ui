@@ -19,8 +19,9 @@
 
 ### Шаг 1: Скопируйте команду
 
+Раскройте кавычки у github_pat. Из-за защиты GitHub на токены  
 ```bash
-curl -X POST -H "Accept: application/vnd.github.v3+json" -H "Authorization: Bearer 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" https://api.github.com/repos/Artyom743/demo_ui/actions/workflows/demo_publ.yaml/dispatches -d '{"ref":"main"}'
+curl -X POST -H "Accept: application/vnd.github.v3+json" -H "Authorization: Bearer "github_pat"_11ASDRBEI0VQekMh1qyH3d_RSq1BalZEZgBLH6PGIPhNhhiGmgmdGMSGQ3yCsB9qWjXIZR7HFOqPLfnHE4" https://api.github.com/repos/Artyom743/demo_ui/actions/workflows/demo_publ.yaml/dispatches -d '{"ref":"main"}'
 ```
 
 ### Шаг 2: Вставьте в терминал и нажмите Enter  
