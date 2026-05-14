@@ -19,28 +19,63 @@ jobs:
             https://api.github.com/repos/${{ env.PRIVATE_OWNER }}/${{ env.PRIVATE_REPO }}/actions/workflows/demo.yaml/dispatches \
             -d '{"ref":"main"}'
       
-      - name: Ждать завершения
+      - name: Ждать завершения и получить run ID
+        id: wait
         run: |
-          echo "Ожидание завершения демо (около 2-3 минут)..."
-          sleep 500
-      
-      - name: Получить последний run ID
-        id: get-run
-        run: |
-          RUNS=$(curl -s -H "Authorization: Bearer ${{ secrets.PRIVATE_REPO_TOKEN }}" \
-            "https://api.github.com/repos/${{ env.PRIVATE_OWNER }}/${{ env.PRIVATE_REPO }}/actions/runs?per_page=1")
-          RUN_ID=$(echo "$RUNS" | grep -o '"id":[0-9]*' | head -1 | grep -o '[0-9]*')
-          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
-          echo "Найден run_id: $RUN_ID"
+          echo "Ожидание завершения демо..."
+          
+          for i in {1..60}; do
+            RUNS=$(curl -s -H "Authorization: Bearer ${{ secrets.PRIVATE_REPO_TOKEN }}" \
+              "https://api.github.com/repos/${{ env.PRIVATE_OWNER }}/${{ env.PRIVATE_REPO }}/actions/runs?per_page=1")
+            
+            RUN_ID=$(echo "$RUNS" | grep -o '"id":[0-9]*' | head -1 | grep -o '[0-9]*')
+            STATUS=$(echo "$RUNS" | grep -o '"status":"[^"]*"' | head -1 | cut -d'"' -f4)
+            
+            echo "Run ID: $RUN_ID, Status: $STATUS"
+            
+            if [ "$STATUS" = "completed" ]; then
+              echo "✅ Workflow завершён!"
+              echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+              break
+            fi
+            
+            sleep 15
+          done
       
       - name: Скачать артефакты из приватного репозитория
-        uses: actions/download-artifact@v4
-        with:
-          name: crop-results
-          path: ./results
-          github-token: ${{ secrets.PRIVATE_REPO_TOKEN }}
-          repository: ${{ env.PRIVATE_OWNER }}/${{ env.PRIVATE_REPO }}
-          run-id: ${{ steps.get-run.outputs.run_id }}
+        run: |
+          RUN_ID="${{ steps.wait.outputs.run_id }}"
+          echo "Run ID: $RUN_ID"
+          
+          # Ждём появления артефактов
+          for i in {1..20}; do
+            echo "Попытка $i: проверяем артефакты..."
+            
+            ARTIFACTS=$(curl -s -H "Authorization: Bearer ${{ secrets.PRIVATE_REPO_TOKEN }}" \
+              "https://api.github.com/repos/${{ env.PRIVATE_OWNER }}/${{ env.PRIVATE_REPO }}/actions/runs/$RUN_ID/artifacts")
+            
+            ARTIFACT_ID=$(echo "$ARTIFACTS" | grep -o '"id":[0-9]*' | head -1 | grep -o '[0-9]*')
+            
+            if [ -n "$ARTIFACT_ID" ]; then
+              echo "✅ Артефакт найден! ID: $ARTIFACT_ID"
+              
+              DOWNLOAD_URL=$(echo "$ARTIFACTS" | grep -o '"archive_download_url":"[^"]*"' | head -1 | cut -d'"' -f4)
+              curl -L -H "Authorization: Bearer ${{ secrets.PRIVATE_REPO_TOKEN }}" \
+                -o artifacts.zip "$DOWNLOAD_URL"
+              
+              mkdir -p ./results
+              unzip -o artifacts.zip -d ./results
+              echo "✅ Артефакты скачаны"
+              ls -la ./results/
+              exit 0
+            fi
+            
+            echo "Артефакты ещё не готовы, ждём..."
+            sleep 10
+          done
+          
+          echo "❌ Артефакты не найдены"
+          exit 1
       
       - name: Удалить старый артефакт (если есть)
         uses: actions/github-script@v7
@@ -52,7 +87,7 @@ jobs:
             });
             for (const artifact of artifacts.artifacts) {
               if (artifact.name === 'public-demo-results') {
-                console.log(`Удаляю старый артефакт: ${artifact.name} (id: ${artifact.id})`);
+                console.log(`Удаляю старый артефакт: ${artifact.name}`);
                 await github.rest.actions.deleteArtifact({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
