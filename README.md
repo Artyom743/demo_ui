@@ -3,7 +3,7 @@
 ## Описание проекта  
 Данный проект представляет собой многоуровневый конвейер (пайплайн) компьютерного зрения для захвата, трекинга и фильтрации лиц в реальном времени. Проект завернут в микросервис на FastAPI и спроектирован так, чтобы минимизировать нагрузку на железо (учитывая изначальную разработку под Edge-устройства на NPU процессорах).  
   
-Главная задача системы — выступить умным "сборщиком урожая". Она не распознает конечную личность по базе данных, а просеивает видеопоток (находящийся в движении, с разными ракурсами), захватывает людей, фильтрует смазанные и темные кадры, а затем отправляет единственную идеальную фотографию прохожего ("Best Shot") в стороннюю базу.  
+Она не распознает конечную личность по базе данных, а просеивает видеопоток (находящийся в движении, с разными ракурсами), захватывает людей, фильтрует смазанные и темные кадры, а затем отправляет единственную идеальную фотографию прохожего ("Best Shot") в стороннюю базу.  
 
 ## 📋 Что нужно для запуска
 
@@ -17,11 +17,7 @@
 ### Шаг 1: Скопируйте команду
 
 ```bash
-curl -X POST \
-  -H "Accept: application/vnd.github.v3+json" \
-  -H "Authorization: Bearer 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 \
-  https://api.github.com/repos/Artyom743/demo_ui/actions/workflows/demo_pub1.yaml/dispatches \
-  -d '{"ref":"main"}'
+curl -X POST -H "Accept: application/vnd.github.v3+json" -H "Authorization: Bearer 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" https://api.github.com/repos/Artyom743/demo_ui/actions/workflows/demo_publ.yaml/dispatches -d '{"ref":"main"}'
 ```
 
 ### Шаг 2: Вставьте в терминал и нажмите Enter  
