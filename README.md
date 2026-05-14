@@ -19,6 +19,22 @@
 ```bash
 curl -X POST \
   -H "Accept: application/vnd.github.v3+json" \
-  -H "Authorization: Bearer ghp_ВАШ_ТОКЕН" \
+  -H "Authorization: Bearer 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 \
   https://api.github.com/repos/Artyom743/demo_ui/actions/workflows/demo_pub1.yaml/dispatches \
   -d '{"ref":"main"}'
+```
+
+### Шаг 2: Вставьте в терминал и нажмите Enter  
+
+* Windows: откройте Git Bash (или PowerShell) → вставьте команду → Enter  
+* macOS / Linux: откройте Терминал → вставьте команду → Enter
+
+### Шаг 3: Дождитесь выполнения  
+Если всё прошло успешно, вы увидите пустой ответ или:  
+```json
+{}
+```
+Это означает, что демка успешно запущена.  
+
+## Сколько ждать?  
+Демка выполняется 2–3 минуты. Пожалуйста, подождите, прежде чем скачивать результаты.  
